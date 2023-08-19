@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  client:
+    container_name: client
+    image: sawlinthant/hidtcophospitalweb:latest
+    ports:
+      - 3000:3000
+  backend:
+    container_name: backend
+    image: sawlinthant/hidtcophospitalapi:latest
+    command: bash -c "alembic upgrade head && uvicorn main:app --forwarded-allow-ips '*' --proxy-headers --host 0.0.0.0 --port 8000"
+    restart: always
+    ports: 
+      - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/HIDT
+      - SECRET_KEY=secret
+      - ALGORITHM=HS256
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=HIDT
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    ports:
+      - 5433:80
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=3TQ*iqpUk8^$z5
+volumes:
+  postgres_data:

@@ -1,6 +1,16 @@
 version: "3.8"
 
 services:
+  nginx:
+    container_name: hidt-nginx
+    depends_on:
+      - client
+      - backend
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - 80:80
   client:
     container_name: client
     image: sawlinthant/hidtcophospitalweb:latest
